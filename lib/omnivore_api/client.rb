@@ -4,7 +4,7 @@ module OmnivoreApi
   class Client
 
     API_VERSION = '0.1'
-    DEFAULT_SERVER = 'https://api.omnivore.io/'
+    DEFAULT_SERVER = 'https://api.omnivore.io'
 
     attr_reader :api_key, :server, :connection
 
@@ -100,12 +100,12 @@ module OmnivoreApi
     end
 
     def request(method, options = {})
-      url     = "/#{API_VERSION}/" + options.fetch(:url)
+      url     = "/#{API_VERSION}" + options.fetch(:url)
       params  = options[:params] || {}
       body    = options[:body].nil? ? nil : options[:body]
       headers = options[:headers]
       timeout = options[:timeout] || 20
-      
+  
       @connection.send(method) do |req|
         req.url(url)
         req.params.merge!(params)
