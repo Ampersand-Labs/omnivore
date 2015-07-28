@@ -2,89 +2,46 @@ require 'spec_helper'
 
 describe "OmnivoreApi::Api::Ticket" do
   before(:each) do
-    @store_id = ENV['PS_OMNIVORE_STORE_ID']
-    @service = OmnivoreApi::Client.new ENV['PS_OMNIVORE_VERSION'].to_sym, ENV['PS_OMNIVORE_API_KEY'], double
-    @ticket = @service.ticket.create @store_id, { body: {order_type: 'dine_in'}}
+    @location_id = '4cxjnnTL'
+    api_key = ENV['OMNIVORE_API_KEY']
+    @service = OmnivoreApi::Client.new api_key
   end
 
-  it "creates a ticket" do
-    expect(@ticket).to be
-    expect(@ticket["ticket"]["order_type"]).to eq 'dine_in'
+  it "gets tickets" do
+    tickets = @service.ticket.list @location_id
+    puts tickets
+    expect(tickets).to be
   end
 
-  it "adds items to a ticket" do
-    order_items = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/order_items.json"))
-    ticket = @service.ticket.add_items @store_id, @ticket["ticket"]["order_id"], {body: order_items}
-    expect(ticket["ticket"]["order_items"].length).to be 1
-  end
-
-  it "submits a ticket" do
-    order_items = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/order_items.json"))
-    ticket = @service.ticket.add_items @store_id, @ticket["ticket"]["order_id"], {body: order_items}
-
-    customer = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/customer.json"))
-    ticket = @service.ticket.submit @store_id, @ticket["ticket"]["order_id"], {body: customer}
-
-    ticket = @service.ticket.find @store_id, @ticket["ticket"]["order_id"]
-    
+  it "gets a ticket" do
+    ticket_id = '9Tkk7ziL'
+    ticket = @service.ticket.retrieve @location_id, ticket_id
+    puts ticket
     expect(ticket).to be
-    expect(ticket["ticket"]["order_type"]).to eq 'dine_in'
   end
 
+  it "opens and voids a ticket" do
+    name = 'MyTicket'
+    params = {
+      employee: 'MjikgioG',
+      order_type: 'jLTqoTba',
+      revenue_center: 'gdTMpTKz',
+      guest_count: 4,
+      name: name
+    }
+    ticket = @service.ticket.open @location_id, body: params
+    puts "------ OPEN ------"
+    puts ticket
+    expect(ticket['name']).to eq(name)
+    expect(ticket['open']).to eq(true)
 
-  it "deletes a non submitted ticket" do
-    ticket = @service.ticket.void @store_id, @ticket["ticket"]["order_id"]
-    expect(ticket).to be
-    expect(ticket["ticket"]["order_status"]).to eq "DELETED"
+    if ticket
+      params = { void: true }
+      ticket = @service.ticket.void @location_id, ticket['id'], body: params
+      puts "------ VOIDED ------"
+      puts ticket
+      expect(ticket['open']).to eq(false)
+    end
   end
 
-  it "deletes a non submitted ticket" do
-    order_items = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/order_items.json"))
-    ticket = @service.ticket.add_items @store_id, @ticket["ticket"]["order_id"], {body: order_items}
-
-    customer = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/customer.json"))
-    ticket = @service.ticket.submit @store_id, @ticket["ticket"]["order_id"], {body: customer}
-    
-    ticket = @service.ticket.void @store_id, @ticket["ticket"]["order_id"]
-    expect(ticket["ticket"]["order_status"]).to eq "DELETED"
-  end
-
-  it "adds a payment to a ticket" do
-    order_items = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/order_items.json"))
-    ticket = @service.ticket.add_items @store_id, @ticket["ticket"]["order_id"], {body: order_items}
-
-    customer = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/customer.json"))
-    ticket = @service.ticket.submit @store_id, @ticket["ticket"]["order_id"], {body: customer}
-
-    payments = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/payments.json"))
-    ticket = @service.ticket.add_payments @store_id, @ticket["ticket"]["order_id"], {body: payments}
-
-    expect(ticket).to be
-    expect(ticket["ticket"]["order_payments"].length).to eq 2
-
-  end
-
-   it "adds a payment to a submitted ticket" do
-    order_items = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/order_items.json"))
-    ticket = @service.ticket.add_items @store_id, @ticket["ticket"]["order_id"], {body: order_items}
-
-    customer = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/customer.json"))
-    ticket = @service.ticket.submit @store_id, @ticket["ticket"]["order_id"], {body: customer}
-
-    payments = JSON.parse(File.read((File.expand_path '../..', __FILE__) + "/fixtures/payments.json"))
-    ticket = @service.ticket.add_payments @store_id, @ticket["ticket"]["order_id"], {body: payments}
-
-    ticket = @service.ticket.submit @store_id, @ticket["ticket"]["order_id"], {body: customer}
-
-    ticket = @service.ticket.find @store_id, @ticket["ticket"]["order_id"]
-
-    expect(ticket).to be
-    expect(ticket["ticket"]["order_payments"][1]["sent_to_pos"]).to eq true
-  end
-
-  it "finds a ticket" do
-    expect(@ticket).to be
-    expect(@ticket["ticket"]["order_type"]).to eq 'dine_in'
-    expect(@ticket["ticket"]["order_id"]).to be
-  end
 end

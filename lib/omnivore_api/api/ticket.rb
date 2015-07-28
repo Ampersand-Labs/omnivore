@@ -11,7 +11,7 @@ module OmnivoreApi
       end
 
       def retrieve location_id, ticket_id
-        @client.post("/locations/#{location_id}/tickets/#{ticket_id}").body
+        @client.get("/locations/#{location_id}/tickets/#{ticket_id}").body
       end
 
       def void location_id, ticket_id, params = {}

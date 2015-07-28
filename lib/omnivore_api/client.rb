@@ -76,6 +76,10 @@ module OmnivoreApi
       OmnivoreApi::Api::TicketItemModifier.new(self)
     end
 
+    def revenue_center
+      OmnivoreApi::Api::RevenueCenter.new(self)
+    end
+
     def get(path, options = {})
       request(:get, parse_query_and_convenience_headers(path, options))
     end

@@ -17,6 +17,7 @@ module OmnivoreApi
   require 'omnivore_api/api/ticket'
   require 'omnivore_api/api/ticket_item'
   require 'omnivore_api/api/ticket_item_modifier'
+  require 'omnivore_api/api/revenue_center'
 
   # dependencies
   require 'faraday'

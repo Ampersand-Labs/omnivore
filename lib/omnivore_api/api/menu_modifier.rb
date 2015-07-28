@@ -1,6 +1,6 @@
 module OmnivoreApi
   module Api
-    class MenuCategory < Base
+    class MenuModifier < Base
       
       def list location_id
         @client.get("/locations/#{location_id}/menu/modifiers").body
