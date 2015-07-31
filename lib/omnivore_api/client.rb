@@ -79,6 +79,10 @@ module OmnivoreApi
     def revenue_center
       OmnivoreApi::Api::RevenueCenter.new(self)
     end
+    
+    def payment
+      OmnivoreApi::Api::Payment.new(self)
+    end
 
     def get(path, options = {})
       request(:get, parse_query_and_convenience_headers(path, options))
@@ -100,7 +104,7 @@ module OmnivoreApi
       opts[:url]    = path
       opts[:method] = options[:method] || :get
       opts[:timeout] = options[:timeout] || 20
-      opts.tap {|p| p[:params] = (options[:params] || {}).merge({ apikey: @consumer_key }) }
+      opts.tap {|p| p[:params] = (options[:params] || {})}
     end
 
     def request(method, options = {})
@@ -116,7 +120,8 @@ module OmnivoreApi
         req.body = body.nil? ? nil : body.to_json
         req.options.timeout = timeout
         req.headers['Content-Type'] = 'application/json'
-        req.headers['Api-Key'] = api_key
+        req.headers['Api-Key'] = api_key.to_s
+        puts req.to_s
       end
     end
   end
