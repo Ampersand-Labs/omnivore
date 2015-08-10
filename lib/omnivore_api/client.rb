@@ -121,7 +121,6 @@ module OmnivoreApi
         req.options.timeout = timeout
         req.headers['Content-Type'] = 'application/json'
         req.headers['Api-Key'] = api_key.to_s
-        puts req.to_s
       end
     end
   end

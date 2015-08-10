@@ -2,8 +2,8 @@ module OmnivoreApi
   module Api
     class Ticket < Base
       
-      def list location_id
-        @client.get("/locations/#{location_id}/tickets").body
+      def list location_id, params = {}
+        @client.get("/locations/#{location_id}/tickets", params).body
       end
 
       def open location_id, params
@@ -17,7 +17,6 @@ module OmnivoreApi
       def void location_id, ticket_id, params = {}
         @client.post("/locations/#{location_id}/tickets/#{ticket_id}", params).body
       end 
-
     end
   end
 end
